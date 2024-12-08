@@ -1,0 +1,103 @@
+.calendario-anual {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Tarjetas flexibles */
+    gap: 4px;
+    padding: 4px;
+    background-color: #f9f9f9; /* Fondo general */
+    color: #333; /* Color del texto */
+  }
+
+  .calendario-anual.disabled {
+    opacity: 0.5; /* Reduce la opacidad para dar efecto grisado */
+    pointer-events: none; /* Evita que se puedan interactuar los clics */
+  }
+  
+  .calendario-anual.disabled .dia {
+    cursor: not-allowed; /* Cambia el cursor a uno deshabilitado */
+  }  
+  
+  .mes {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 4px;
+    background: #ffffff; /* Fondo del mes */
+  }
+  
+  .titulo-mes {
+    display: grid;
+    text-align: center;
+    font-size: 1rem;
+    margin-bottom: 4px;
+    color: #555; /* Color del título del mes */
+    grid-template-columns: repeat(7, minmax(40px, 1fr));
+    grid-template-rows: 1fr 1fr;
+    text-overflow: ellipsis;
+    user-select: none;
+  }
+  
+  .titulo-mes div:first-child{
+    grid-column: 1 / 8;
+    font-weight: bold;
+  }
+  
+  .dias {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* Siete columnas para los días */
+    gap: 4px;
+    user-select: none;
+  }
+  
+  .encabezado-dia {
+    text-align: center;
+    color: #444;
+    padding: 1px;
+    background-color: #e9e9e9; /* Fondo del encabezado */
+    border: 1px solid #ddd;
+    font-size: small;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  
+  .dia {
+    text-align: center;
+    padding: 4px;
+    background: #f1f1f1; /* Fondo de cada día */
+    color: #000; /* Color del texto del día */
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+  
+  .dia.vacio {
+    background: transparent;
+    border: none;
+  }
+  
+  .dia:hover {
+    background: #e0e0e0; /* Fondo al pasar el ratón */
+    cursor: pointer;
+  }
+  
+  .active {
+    font-weight: bold;
+  }
+
+  .dia:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .dia.active {
+    background-color: var(--mui-palette-secondary-main);
+    color: #fff;
+  }
+  
+  .dia.add-day {
+    background-color: var(--mui-palette-primary-extra);
+    color: #fff;
+  }
+  
+  .dia.exclude-day {
+    background-color: var(--mui-palette-secondary-extra);
+    color: #fff;
+  }

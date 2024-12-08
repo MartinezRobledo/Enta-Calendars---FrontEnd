@@ -1,0 +1,38 @@
+/* Estilos para el modal */
+.ReactModal__Overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Fondo negro con baja opacidad */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+  }
+  
+  .ReactModal__Content {
+    width: 90vw; /* 90% del ancho de la ventana */
+    height: 90vh; 
+    outline: none; /* Elimina el borde azul que aparece en algunos navegadores */
+    overflow: hidden; /* Ocultar contenido que se desborde */
+    background: white;
+    border-radius: 8px; /* Bordes redondeados, opcional */
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1); /* Sombra para darle un efecto de elevación */
+    display: flex;
+    flex-direction: column; /* Asegura que el contenido se distribuya verticalmente */
+  }
+  
+  .ReactModal__Content > * {
+    flex: 1;
+    /* overflow-y: auto; Habilita el scroll vertical si el contenido es demasiado alto */
+    overflow-x: hidden; /* Previene el scroll horizontal */
+    padding: 16px; /* Agrega un poco de espacio interno */
+    box-sizing: border-box; /* Asegura que el padding no incremente el tamaño total del contenido */
+  }
+  
+  :root {
+    --animate-duration: 400ms;
+    --animate-delay: 0.5s;
+  }

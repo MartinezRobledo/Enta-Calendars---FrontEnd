@@ -1,0 +1,11 @@
+/* .animate__animated.animate__rubberBand {
+    --animate-duration: 0.5s;
+  } */
+
+  :root {
+    --mui-palette-primary-main: #049cfc;
+    --mui-palette-primary-extra: #0075ff;
+    --mui-palette-secondary-main: #fc8b04;
+    --mui-palette-secondary-extra: #9c9c9c;
+  }
+  
