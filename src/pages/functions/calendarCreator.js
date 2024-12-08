@@ -35,7 +35,7 @@ function fechasToBp(fechasDeEjecucion = [], fechaInicio, fechaFin) {
     return otherDates;
 }
 
-  export const createCalendarbp = ( template = {}, fechas = [], title, user, inicio, fin )=> {
+export const createCalendarbp = ( template = {}, fechas = [], title, user, inicio, fin )=> {
 
     const replacements = {
         "NOMBRE":title,

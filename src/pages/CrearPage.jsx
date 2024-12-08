@@ -1,6 +1,6 @@
 import { Grid, Input } from "@mui/material"
 import { Navbar, CapasForm } from "../components"
-import { useConfigStore, useUiStore } from "../hooks"
+import { useAuthStore, useConfigStore, useInitializeApp, useUiStore } from "../hooks"
 import { SpinModal } from "../components/spinner/spinModal";
 import Calendar from "../components/calendar/Calendar";
 import { useEffect, useRef, useState } from "react";
@@ -10,12 +10,17 @@ import Swal from 'sweetalert2';
 import { styled } from '@mui/material/styles';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
+import { ExportBprelease, ExportCsv } from "./functions/documentCreator";
+import { createCalendarAutomation, createCalendarbp } from "./functions/calendarCreator";
 
 const extensions = ['.bprelease', '.csv'];
 
 export const CrearPage = () => {
  
-  const { titleStore, diasActivosStore, changeTitle, changeDiasActivos } = useConfigStore();
+  const { titleStore, diasActivosStore, aditionalDaysToAdd, aditionalDaysToRemove, capasStore,
+          changeTitle, changeDiasActivos } = useConfigStore();
+  const { user } = useAuthStore();
+  const { templates } = useInitializeApp();
   const {isSpinActive} = useUiStore();
   const [isDisabled, setIsDisabled] = useState(false); // Nuevo estado para deshabilitar formulario
   const [showButtons, setShowButtons] = useState(false);
@@ -36,10 +41,14 @@ export const CrearPage = () => {
   useEffect(() => {
     // Función de limpieza que se ejecuta al desmontar
     return () => {
-      titleRef.current ? changeTitle(titleRef.current) : null; // Llama a changeTitle con el título que deseas guardar
-      diasRef.current ? changeDiasActivos(diasRef.current) : [];
+      actualizarStore();
     };
   }, []);
+
+  const actualizarStore = () => {
+    titleRef.current ? changeTitle(titleRef.current) : null; // Llama a changeTitle con el título que deseas guardar
+    diasRef.current ? changeDiasActivos(diasRef.current) : [];
+  }
 
   const validarExportacion = () => {
     if(!title) {
@@ -71,6 +80,23 @@ export const CrearPage = () => {
   }
 
   const exportar = (ext) => {
+    actualizarStore();
+    const diasFinales = [...new Set(
+    [...diasActivos, ...aditionalDaysToAdd]
+    )].flat()
+    .filter(
+      day => !aditionalDaysToRemove.includes(day)
+    )
+    const inicio = new Date(Math.min(...capasStore.map(capa => {
+      return capa.data.initCalendar;
+    })));
+    const fin = new Date(Math.max(...capasStore.map(capa => {
+      return capa.data.finishCalendar;
+    })));
+    if(ext == '.bprelease')
+      ExportBprelease(createCalendarbp(templates, diasFinales, title, user.name, inicio, fin), title);
+    else
+      ExportCsv(createCalendarAutomation(diasFinales), title);
   }
 
   const cancelar = () => {

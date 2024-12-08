@@ -5,7 +5,7 @@ const ButtonGroup = ({extensions = [], setOption}) => {
   return (
     <ToggleButtonGroup
         value={extensions} // Pasamos el array de días seleccionados
-        onChange={(event, option) => {setOption(option)}}
+        onChange={(event) => {setOption(event.target.value)}}
         aria-label="Extensiones"
         sx={{ display: 'flex', flexWrap: 'wrap' }}
       >
