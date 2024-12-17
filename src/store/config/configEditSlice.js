@@ -1,36 +1,38 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { isSameDay } from 'date-fns';
 
-export const configSlice = createSlice({
-    name: 'config',
+export const configEditSlice = createSlice({
+    name: 'configEdit',
     initialState: {
         titleStore: '',
-        capasStore: [],
+        capasStore: [{
+            id: 1,
+            title: 'Capa 1',
+            data: {
+              initCalendar: new Date(),
+              finishCalendar: new Date(),
+              byWeekday: {},
+              byMonthday: [],
+              byMonthdayStr: '',
+              allDays: false,
+              agrupar: false,
+              withHolidays: true,
+            },
+            dependienteDe: null,
+            esPadre: [],
+            dias: [],
+          }],
         capaActualStore: 0,
         aditionalDaysToAdd: [],
         aditionalDaysToRemove: [],
         diasActivosStore: [],
+        _id: null,
+        isDisabled: true,
         fechaActualizacion: null,
     },
     reducers: {
-        onInitializeCapa: (state, { payload }) => {
-            state.capasStore = [{
-                id: 1,
-                title: 'Capa 1',
-                data: {
-                  initCalendar: new Date(payload, 0, 1),
-                  finishCalendar: new Date(payload, 11, 31),
-                  byWeekday: {},
-                  byMonthday: [],
-                  byMonthdayStr: '',
-                  allDays: false,
-                  agrupar: false,
-                  withHolidays: true,
-                },
-                dependienteDe: null,
-                esPadre: [],
-                dias: [],
-              }];
+        onInitializeCapaEdit: (state, { payload }) => {
+            Object.assign(state, payload);
         },
         onChangeTitle: (state, { payload }) => {
             state.titleStore = payload;
@@ -85,11 +87,11 @@ export const configSlice = createSlice({
 
 // Exporta las acciones
 export const {
+    onInitializeCapaEdit,
     onChangeTitle,
     onChangeAditionalDaysToAdd,
     onChangeAditionalDaysToRemove,
     onChangeDiasActivos,
     onChangeCapas,
     onChangeCapaActual,
-    onInitializeCapa,
-} = configSlice.actions;
+} = configEditSlice.actions;

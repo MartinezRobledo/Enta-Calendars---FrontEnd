@@ -1,25 +1,29 @@
 import { useDispatch, useSelector } from "react-redux";
-import { onAddNewEvent } from "../store/calendar/calendarSlice";
+import { onDeleteCalendar } from "../store/calendar/calendarSlice";
 
 export const useCalendarStore = () => {
   
     const dispatch = useDispatch();
 
     const {
-        events
+        calendars,
+        status, // 'idle' | 'loading' | 'succeeded' | 'failed'
+        error,
     } = useSelector( state => state.calendar );
 
-
-    const addNewEvent = ( calendarEvent ) => {
-        dispatch( onAddNewEvent(calendarEvent) );
+    const deleteCalendar = async(id) => {
+        console.log("Eliminando calendario del store");
+        dispatch(onDeleteCalendar(id));
     }
 
     return {
         //*Propiedades
-        events,
+        calendars,
+        status, // 'idle' | 'loading' | 'succeeded' | 'failed'
+        error,
 
         //*Metodos
-        addNewEvent,
+        deleteCalendar,
     }
 }
 

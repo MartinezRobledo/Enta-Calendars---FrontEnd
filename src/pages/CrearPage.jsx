@@ -1,6 +1,6 @@
 import { Grid, Input } from "@mui/material"
 import { Navbar, CapasForm } from "../components"
-import { useAuthStore, useConfigStore, useInitializeApp, useUiStore } from "../hooks"
+import { useAuthStore, useConfigStore, useBD, useUiStore } from "../hooks"
 import { SpinModal } from "../components/spinner/spinModal";
 import Calendar from "../components/calendar/Calendar";
 import { useEffect, useRef, useState } from "react";
@@ -11,23 +11,39 @@ import { styled } from '@mui/material/styles';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { ExportBprelease, ExportCsv } from "./functions/documentCreator";
-import { createCalendarAutomation, createCalendarbp } from "./functions/calendarCreator";
+import { createCalendarAutomation, createCalendarbp, generarHashCalendario } from "./functions/calendarCreator";
 
 const extensions = ['.bprelease', '.csv'];
 
 export const CrearPage = () => {
  
-  const { titleStore, diasActivosStore, aditionalDaysToAdd, aditionalDaysToRemove, capasStore,
-          changeTitle, changeDiasActivos } = useConfigStore();
+  const { titleStore, 
+          diasActivosStore, 
+          aditionalDaysToAdd, 
+          aditionalDaysToRemove, 
+          capasStore, 
+          capaActualStore,
+          changeTitle, 
+          changeDiasActivos, 
+          changeCapas, 
+          changeCapaActual,
+          changeAditionalDaysToAdd,
+          changeAditionalDaysToRemove
+        } = useConfigStore();
+
   const { user } = useAuthStore();
-  const { templates } = useInitializeApp();
+  const { templates, añoFiscal, saveConfig, getCalendars } = useBD();
   const {isSpinActive} = useUiStore();
   const [isDisabled, setIsDisabled] = useState(false); // Nuevo estado para deshabilitar formulario
   const [showButtons, setShowButtons] = useState(false);
-  const diasRef = useRef([]); // Usamos useRef para rastrear el valor actual de `title`
-  const titleRef = useRef(""); // Usamos useRef para rastrear el valor actual de `title`
   const [diasActivos, setDiasActivos] = useState(diasActivosStore);
   const [title, setTitle] = useState(titleStore);
+  const [capaActual, setCapaActual] = useState(capaActualStore);
+  const [capas, setCapas] = useState(capasStore);
+  const titleRef = useRef(""); // Usamos useRef para rastrear el valor actual de `title`
+  const diasRef = useRef([]); // Usamos useRef para rastrear el valor actual de `title`
+  const capasRef = useRef(capas);
+  const capaActualRef = useRef(capaActual);
 
   // Sincroniza `title` con el `ref`
   useEffect(() => {
@@ -36,9 +52,33 @@ export const CrearPage = () => {
 
   useEffect(() => {
     diasRef.current = diasActivos;
+    capasRef.current = capas;
   }, [diasActivos]);
 
   useEffect(() => {
+    capaActualRef.current = capaActual;
+  }, [capaActual]);
+
+  useEffect(() => {
+    if(capasStore && capasStore.length === 0)
+      setCapas([{
+        id: 1,
+        title: 'Capa 1',
+        data: {
+            initCalendar: new Date(añoFiscal, 0, 1),
+            finishCalendar: new Date(añoFiscal, 11, 31),
+            byWeekday: {},
+            byMonthday: [],
+            byMonthdayStr: '',
+            allDays: false,
+            withHolidays: true,
+        },
+        dependienteDe: null,
+        esPadre: [],
+        dias: [],
+    }]);
+
+    changeCapas();
     // Función de limpieza que se ejecuta al desmontar
     return () => {
       actualizarStore();
@@ -48,6 +88,8 @@ export const CrearPage = () => {
   const actualizarStore = () => {
     titleRef.current ? changeTitle(titleRef.current) : null; // Llama a changeTitle con el título que deseas guardar
     diasRef.current ? changeDiasActivos(diasRef.current) : [];
+    capasRef.current ? changeCapas(capasRef.current) : [];
+    capaActualRef.current ? changeCapaActual(capaActualRef.current) : null;
   }
 
   const validarExportacion = () => {
@@ -79,24 +121,61 @@ export const CrearPage = () => {
     setShowButtons(true);
   }
 
-  const exportar = (ext) => {
+  const exportar = async(ext) => {
+
     actualizarStore();
-    const diasFinales = [...new Set(
-    [...diasActivos, ...aditionalDaysToAdd]
-    )].flat()
+
+    const diasFinales = [...new Set([...diasActivos, ...aditionalDaysToAdd])]
     .filter(
-      day => !aditionalDaysToRemove.includes(day)
-    )
-    const inicio = new Date(Math.min(...capasStore.map(capa => {
+        day => !aditionalDaysToRemove.some(removedDay => 
+            new Date(day).getTime() === new Date(removedDay).getTime()
+        )
+    );
+
+    const inicio = new Date(Math.min(...capas.map(capa => {
       return capa.data.initCalendar;
     })));
-    const fin = new Date(Math.max(...capasStore.map(capa => {
+
+    const fin = new Date(Math.max(...capas.map(capa => {
       return capa.data.finishCalendar;
     })));
+
+    //Generar Hash para ID con días finales
+    const idBD = await generarHashCalendario(diasFinales, user.name);
+    const calendario = {
+      _id: idBD,
+      cliente: user.name,
+      titleStore: titleRef.current,
+      capasStore: capas,
+      capaActualStore: capaActualStore,
+      aditionalDaysToAdd: aditionalDaysToAdd,
+      aditionalDaysToRemove: aditionalDaysToRemove,
+      diasActivosStore: diasActivosStore,
+      fechaActualizacion: new Date(),
+    }
+
+    //Guardar las Capas del Store en la base de datos
+    const {result, error} = await saveConfig(calendario);
+    if(error) {
+      console.log(error)
+      Swal.fire({
+        icon: 'error',
+        title: 'No se pudo guardar el calendario',
+        text: error.response.data.msg,
+        confirmButtonText: 'Entendido',
+        buttonsStyling: true, // Permite personalizar el estilo del botón
+        confirmButtonColor: '#ff8a00'
+      });
+      return;
+    }
+
     if(ext == '.bprelease')
-      ExportBprelease(createCalendarbp(templates, diasFinales, title, user.name, inicio, fin), title);
+      ExportBprelease(createCalendarbp(templates, diasFinales, title, user.name, inicio, fin, añoFiscal), title);
     else
       ExportCsv(createCalendarAutomation(diasFinales), title);
+
+      getCalendars(user.name);   //Traigo nuevamente los datos de la base de datos.
+      cancelar();
   }
 
   const cancelar = () => {
@@ -130,6 +209,10 @@ export const CrearPage = () => {
             <CapasForm 
               isDisabled={isDisabled}
               setDiasActivos={setDiasActivos}
+              capaActual={capaActual}
+              capas={capas}
+              setCapaActual={setCapaActual}
+              setCapas={setCapas}
             />
 
             <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center', marginTop:'2rem'}}>
@@ -160,9 +243,13 @@ export const CrearPage = () => {
           </Grid>
           <Grid item xs={12} md={6} xl>
             <Calendar 
-              anio={2024} 
+              anio={añoFiscal} 
               isDisabled={isDisabled}
               diasActivos={diasActivos}
+              aditionalDaysToAdd={aditionalDaysToAdd}
+              aditionalDaysToRemove={aditionalDaysToRemove}
+              changeAditionalDaysToAdd={changeAditionalDaysToAdd}
+              changeAditionalDaysToRemove={changeAditionalDaysToRemove}
             />
           </Grid>
         </Grid>

@@ -5,6 +5,7 @@ export const authSlice = createSlice({
     initialState: {
         status: 'checking',
         errorMessage: undefined,
+        user: {},
     },
     reducers: {
         onChecking: ( state ) => {

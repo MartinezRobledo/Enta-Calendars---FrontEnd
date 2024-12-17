@@ -17,7 +17,7 @@ import Logo from '../../assets/images/logo-enta-horizontal-blanco-h100.png'
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../hooks';
 
-const pages = [{title:'Crear', path:'/crear'}, {title:'Actualizar', path:'/actualizar'}];
+const pages = [{title:'Crear', path:'/crear'}, {title:'Monitor', path:'/monitor'}, {title:'Editar', path:'/editar'}];
 const settings = ['Usuario', 'Salir'];
 
 export const Navbar = ()=> {
@@ -135,13 +135,12 @@ export const Navbar = ()=> {
               </Button>
             ))}
           </Box>
-
           <Box 
             sx={{ flexGrow: 0, display: 'flex', width: '160px', justifyContent: 'flex-end' }}>
             <Typography alignSelf={'center'} sx={{color:'white', fontWeight:'bold', m:1}}>{user.name}&nbsp;</Typography>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Adrián Martinez" src="" />
+                <Avatar alt={user.name} src={user.picture} />
               </IconButton>
             </Tooltip>
             <Menu

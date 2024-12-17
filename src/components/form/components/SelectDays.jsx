@@ -1,13 +1,13 @@
 import { Checkbox, FormControlLabel, Grid, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material';
 
-export const SelectDays = ({byWeekday = {}, onChangeSelectDays, allDays, isDisabled }) => {
+export const SelectDays = ({byWeekday = {}, onChangeSelectDays, allDays, isDisabled, agrupar, setAgrupar }) => {
   const tempOfWeek = {
     'Lunes': 0,
     'Martes': 1,
-    'Miércoles': 2,
+    'Miercoles': 2,
     'Jueves': 3,
     'Viernes': 4,
-    'Sábado': 5,
+    'Sabado': 5,
     'Domingo': 6
   };
 
@@ -83,6 +83,19 @@ export const SelectDays = ({byWeekday = {}, onChangeSelectDays, allDays, isDisab
               />
             }
             label="Todos los días"
+          />
+        </Grid>
+        <Grid item>
+          <FormControlLabel
+            control={
+              <Checkbox
+                disabled={isDisabled}
+                checked={agrupar}
+                onChange={(status) => setAgrupar(status.target.checked)}
+                color="primary"
+              />
+            }
+            label="Agrupar"
           />
         </Grid>
       </Grid>

@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { CalendarForm } from './Form';
-import { Tab, Tabs, Box, Typography, Autocomplete, TextField } from '@mui/material';
+import { Tab, Tabs, Box, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import Swal from 'sweetalert2';
-import { useConfigStore, useInitializeApp } from '../../hooks';
-import { filterHolidays, normalizeByMonthday, normalizeByMonthdayDependence, recortarDiasPorConfiguracion, Rules } from './functions/Rules';
+import { useBD } from '../../hooks';
+import { encontrarDiasCoincidentes, filterHolidays, normalizeByMonthday, normalizeByMonthdayDependence, recortarDiasPorConfiguracion, Rules } from './functions/Rules';
+import AutocompleteCustom from './components/AutocompleteCustom';
 
 function tieneCiclo(capas, origen, destino) {
   if (!destino) return false; 
@@ -17,34 +18,31 @@ function tieneCiclo(capas, origen, destino) {
   return false;
 }
 
-export const CapasForm = ({ isDisabled, setDiasActivos }) => {
-  const {capasStore, capaActualStore, changeCapas, changeCapaActual} = useConfigStore();
-  const { añoFiscal, holidays } = useInitializeApp();
-  const [capaActual, setCapaActual] = useState(capaActualStore);
-  const [capas, setCapas] = useState(capasStore);
-  const capasRef = useRef(capas);
-  const capaActualRef = useRef(capaActual);
+export const CapasForm = ({ isDisabled, capaActual, capas, setDiasActivos, setCapaActual, setCapas }) => {
+  
+  const { añoFiscal, holidays } = useBD();
 
-  const agregarCapa = () => {
-    const nuevaCapa = {
-      id: capas.length + 1,
-      title: `Capa ${capas.length + 1}`,
-      data: {
-        initCalendar: new Date(añoFiscal, 0, 1),
-        finishCalendar: new Date(añoFiscal, 11, 31),
-        byWeekday: {},
-        byMonthday: [],
-        byMonthdayStr: '',
-        allDays: false,
-        withHolidays: true,
-      },
-      dependienteDe: null,
-      esPadre: [],
-      dias: [],
-    };
-    setCapas((prev) => [...prev, nuevaCapa]);
-    setCapaActual(capas.length);
+const agregarCapa = () => {
+  const nuevaCapa = {
+    id: capas.length + 1,
+    title: `Capa ${capas.length + 1}`,
+    data: {
+      initCalendar: new Date(añoFiscal, 0, 1),
+      finishCalendar: new Date(añoFiscal, 11, 31),
+      byWeekday: {},
+      byMonthday: [],
+      byMonthdayStr: '',
+      allDays: false,
+      agrupar: false,
+      withHolidays: true,
+    },
+    dependienteDe: null,
+    esPadre: [],
+    dias: [],
   };
+  setCapas((prev) => [...prev, nuevaCapa]);
+  setCapaActual(capas.length);
+};
 
   const eliminarCapa = (index) => {
     if (capas.length === 1) return; // No permitir eliminar si solo queda una capa
@@ -120,6 +118,9 @@ const actualizarCapaYDependientes = (indiceCapa, nuevasCapas) => {
   if (!capaActual.data.withHolidays) {
       capaActual.dias = filterHolidays(capaActual.dias, holidays);
   }
+
+  if(capaActual.data.agrupar)
+    capaActual.dias = encontrarDiasCoincidentes(capaActual.dias, Object.keys(capaActual.data.byWeekday).length, añoFiscal);
 
   // Si la capa tiene hijos, actualízalos recursivamente
   if (capaActual.esPadre.length > 0) {
@@ -255,7 +256,6 @@ const agregarDependencia = (dependienteDe) => {
 };
 
   const diasActivos = useMemo(() => {
-    capasRef.current = capas;
     return capas
       .filter((capa) => capa.esPadre.length === 0)
       .map((capa) => capa.dias)
@@ -264,19 +264,9 @@ const agregarDependencia = (dependienteDe) => {
 
   useEffect(() => {
     setDiasActivos(diasActivos);
+    setCapas(capas);
+    setCapaActual(capaActual);
   }, [diasActivos, setDiasActivos]);
-
-  useEffect(() => {
-    capaActualRef.current = capaActual;
-  }, [capaActual]);
-  
-  useEffect(() => {
-    // Función de limpieza que se ejecuta al desmontar
-    return () => {
-      changeCapas(capasRef.current);
-      changeCapaActual(capaActualRef.current);
-    };
-  }, []);
 
   return (
     <Box>
@@ -343,27 +333,14 @@ const agregarDependencia = (dependienteDe) => {
         isDisabled={isDisabled}
       />
       <Box mt={2}>
-        <Autocomplete
-          disabled={isDisabled}
-          disablePortal
-          options={capas
-            .filter((_, idx) => idx !== capaActual) // Excluir la capa actual
-            .map((capa) => ({ label: capa.title, id: capa.id }))} // Simplificar las opciones
-          getOptionLabel={(option) => option.label || ''} // Definir cómo mostrar las opciones
-          isOptionEqualToValue={(option, value) => option.id === value?.id} // Comparar correctamente opciones
-          value={
-            capas[capaActual]?.dependienteDe !== null
-              ? capas
-                  .filter((_, idx) => idx !== capaActual) // Filtrar capas válidas
-                  .map((capa) => ({ label: capa.title, id: capa.id }))
-                  .find((option) => option.id === capas[capaActual].dependienteDe || null) // Buscar la opción actual
-              : null
-          } // Asegurarse de que el valor sea consistente con las opciones
-          onChange={(_, newValue) =>
-            manejarCambioDependencia(newValue ? parseInt(newValue.id) : null)
-          } // Actualizar el estado al cambiar
-          renderInput={(params) => <TextField {...params} label="Depende de:" />} // Input con etiqueta
-          sx={{ width: 300 }} // Estilo del componente
+        <AutocompleteCustom 
+          isDisabled={isDisabled}
+          options={capas}
+          actualOption={capaActual}
+          criterio={capas[capaActual]?.dependienteDe}
+          label={'Depende de:'}
+          handleChange={manejarCambioDependencia}
+          width={300}
         />
       </Box>
     </Box>

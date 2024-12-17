@@ -35,7 +35,26 @@ function fechasToBp(fechasDeEjecucion = [], fechaInicio, fechaFin) {
     return otherDates;
 }
 
-export const createCalendarbp = ( template = {}, fechas = [], title, user, inicio, fin )=> {
+export async function generarHashCalendario(diasFinales, cliente) {
+    // Normaliza el array ordenándolo
+    const diasOrdenados = [...diasFinales].sort();
+    
+    // Convierte a string
+    const dataString = JSON.stringify(diasOrdenados) + cliente;
+    const encoder = new TextEncoder();
+    const data = encoder.encode(dataString);
+
+    // Genera el hash usando SHA-256
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+
+    // Convierte el hash a hexadecimal
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+    return hashHex;
+}
+
+export const createCalendarbp = ( template = {}, fechas = [], title, user, inicio, fin, año )=> {
 
     const replacements = {
         "NOMBRE":title,
@@ -43,7 +62,7 @@ export const createCalendarbp = ( template = {}, fechas = [], title, user, inici
         "FECHA": formatDateBP(new Date()),
         "USUARIO":user,
         "HABILES":"127",
-      }
+    }
 
     let templateCharged = {...template};
 
@@ -55,11 +74,20 @@ export const createCalendarbp = ( template = {}, fechas = [], title, user, inici
         }
     }
 
+    const startDate = new Date(Number(año) + 1, 0, 1);
+    
     const otherDates = fechasToBp(fechas, inicio, fin);
+    const daysOfNextYear = [];
+    for (let i = 0; i < 366; i++) {
+        const other = new Date(startDate);
+        other.setDate(startDate.getDate() + i);
+        daysOfNextYear.push(other); // Formato YYYY-MM-DD
+    }
 
     // Crear la estructura de <other-holidays> con las fechas en formato <other-date>
     const otherHolidays = '<other-holidays>\n' +
     otherDates.map(fecha => `<other-date value='${new Date(fecha).toISOString().split('T')[0]}' />\n`).join('') +
+    daysOfNextYear.map(fecha => `<other-date value='${new Date(fecha).toISOString().split('T')[0]}' />\n`).join('') +
     '</other-holidays>';
 
     // Reemplazo other holidays

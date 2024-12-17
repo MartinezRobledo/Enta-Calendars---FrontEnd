@@ -6,7 +6,7 @@ import { SelectDays } from "./components/SelectDays";
 import { TextFieldCustom } from "./components/TextFieldCustom";
 
 export const CalendarForm = ({ data, actualizarDatosCapa, isDisabled }) => {
-  const { initCalendar, finishCalendar, byWeekday = {}, byMonthdayStr, allDays, withHolidays } = data;
+  const { initCalendar, finishCalendar, byWeekday = {}, byMonthdayStr, allDays, agrupar, withHolidays } = data;
 
   // Memorizar configuraciones específicas para cada componente
   const initCalendarProps = useMemo(() => ({
@@ -26,10 +26,13 @@ export const CalendarForm = ({ data, actualizarDatosCapa, isDisabled }) => {
   const selectDaysProps = useMemo(() => ({
     onChangeSelectDays: (weekday, checked) =>
       actualizarDatosCapa({ byWeekday: weekday, allDays: checked }),
+    setAgrupar: (checked) => 
+      actualizarDatosCapa({ agrupar: checked }),
     byWeekday,
     allDays,
     isDisabled,
-  }), [byWeekday, allDays, actualizarDatosCapa, isDisabled]);
+    agrupar,
+  }), [byWeekday, allDays, agrupar, actualizarDatosCapa, isDisabled]);
 
   const textFieldProps = useMemo(() => ({
     byMonthdayStr,

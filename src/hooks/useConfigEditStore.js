@@ -4,10 +4,11 @@ import { onChangeAditionalDaysToAdd,
         onChangeCapaActual,
         onChangeCapas,
         onChangeDiasActivos, 
-        onChangeTitle 
-} from "../store/config/configSlice";
+        onChangeTitle,
+        onInitializeCapaEdit } from "../store/config/configEditSlice";
 
-export const useConfigStore = ()=> {
+
+export const useConfigEditStore = ()=> {
 
     const dispatch = useDispatch();
 
@@ -18,7 +19,9 @@ export const useConfigStore = ()=> {
         diasActivosStore,
         aditionalDaysToAdd,
         aditionalDaysToRemove,
-    } = useSelector( state => state.config ); // Accede a configSlice
+        _id,
+        isDisabled,
+    } = useSelector( state => state.configEdit ); // Accede a configSlice
 
     const changeTitle = (value) => {
         dispatch( onChangeTitle(value) );
@@ -44,6 +47,10 @@ export const useConfigStore = ()=> {
         dispatch(onChangeCapaActual(capa));
     }
 
+    const changeOnInitializeCapaEdit = (capa) => {
+        dispatch(onInitializeCapaEdit(capa));
+    }
+
     return {
         //* Propiedades
         titleStore,
@@ -52,6 +59,8 @@ export const useConfigStore = ()=> {
         diasActivosStore,
         aditionalDaysToAdd,
         aditionalDaysToRemove,
+        _id,
+        isDisabled,
 
         //* Métodos
         changeTitle,
@@ -60,5 +69,6 @@ export const useConfigStore = ()=> {
         changeAditionalDaysToRemove,
         changeDiasActivos,
         changeCapaActual,
+        changeOnInitializeCapaEdit,
     }
 }

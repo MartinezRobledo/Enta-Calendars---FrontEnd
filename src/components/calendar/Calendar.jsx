@@ -19,13 +19,7 @@ const obtenerDiasDelMes = (anio, mes) => {
   return new Date(anio, mes + 1, 0).getDate(); // Último día del mes.
 };
 
-function Calendar({ anio, isDisabled, diasActivos }) {
-  const {
-    aditionalDaysToAdd,
-    aditionalDaysToRemove,
-    changeAditionalDaysToAdd,
-    changeAditionalDaysToRemove,
-  } = useConfigStore();
+function Calendar({ anio, isDisabled, diasActivos, aditionalDaysToAdd, aditionalDaysToRemove, changeAditionalDaysToAdd, changeAditionalDaysToRemove }) {
 
   const manejarClickDia = (dia, boton, e) => {
     e.preventDefault(); // Prevenir el comportamiento predeterminado del clic con la rueda

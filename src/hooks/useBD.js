@@ -1,10 +1,13 @@
 import { useDispatch, useSelector } from "react-redux";
-import { initializeConfig, onStartLoadingHolidays, onStartLoadingTemplates } from "../store";
+import { onInitializeCapa, onStartLoadingHolidays, onStartLoadingTemplates } from "../store";
 import { calendarApi } from "../api";
+import { fetchCalendars } from "../store/calendar/calendarSlice";
+import { useAuthStore } from "./useAuthStore";
 
-export const useInitializeApp = () => {
+export const useBD = () => {
 
     const dispatch = useDispatch();
+    const { user } = useAuthStore();
 
     const {
         holidays,
@@ -30,14 +33,34 @@ export const useInitializeApp = () => {
             }
             const holidays = data.feriados.feriados_ar.map((day) => new Date(day));
             dispatch(onStartLoadingHolidays({ holidays, año: data.feriados.año }));
+            dispatch(onInitializeCapa(data.feriados.año));
         } catch (error) {
             console.error("Error al cargar los feriados:", error);
             throw error; // Propaga el error para manejarlo en el componente
         }
     };
 
-    const startInitialConfig = () => {
-        dispatch(initializeConfig());
+    const saveConfig = async(calendario) => {
+        try{
+            const { data } = await calendarApi.post('/calendars', calendario);
+            return { data, error:null };
+        }
+        catch (error) {
+            return { data: null, error };
+        }
+    }
+
+    const deleteCalendarFetch = async(id) => {
+        try {
+            const { data } = await calendarApi.delete('/calendars/'+id);
+            return { data, error:null };
+        } catch(error) {
+            return { data:null, error };
+        }
+    }
+
+    const getCalendars = async() => {
+        dispatch(fetchCalendars(user.name));
     }
 
     return {
@@ -49,6 +72,8 @@ export const useInitializeApp = () => {
         //* Métodos
         startLoadingHolidays,
         startLoadingTemplates,
-        startInitialConfig
+        saveConfig,
+        getCalendars,
+        deleteCalendarFetch,
     }
 };

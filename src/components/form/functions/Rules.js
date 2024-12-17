@@ -1,5 +1,5 @@
 import { RRule } from 'rrule';
-import { getMonth } from 'date-fns';
+import { addDays, getMonth, startOfYear } from 'date-fns';
 
 const diasHastaFinMes = (actual) => {
   let dias = []
@@ -85,6 +85,31 @@ export function normalizeByMonthdayDependence(byMonthday, parentbyMonthday) {
   return nuevosdias;
 }
 
+export function encontrarDiasCoincidentes(diasArray, coincidenciasRequeridas, añoActual) {
+  if (!Array.isArray(diasArray) || typeof coincidenciasRequeridas !== "number") {
+    throw new Error("Parámetros inválidos");
+  }
+
+  const diasResultantes = [];
+  const primerDiaAño = new Date(añoActual, 0, 1); // Obtiene el 1 de enero del año actual
+
+  // Recorremos los días del año en bloques de 7 días
+  for (let i = 0; i < 365; i += 7) {
+    const bloque = Array.from({ length: 7 }, (_, j) => addDays(primerDiaAño, i + j)); // Bloque de 7 días
+
+    // Filtramos los días del bloque que estén en diasArray
+    const diasCoincidentes = bloque.filter((dia) => 
+      diasArray.some((d) => d.getTime() === dia.getTime())
+    );
+
+    if (diasCoincidentes.length >= coincidenciasRequeridas) {
+      diasResultantes.push(...diasCoincidentes); // Agregamos los días coincidentes
+    }
+  }
+
+  return diasResultantes;
+}
+
 export const recortarDiasPorConfiguracion = (diasDependientes, capa) => {
   const { byWeekday, byMonthday } = capa.data;
   let diasFiltrados = getDaysBetween(diasDependientes, capa.data.initCalendar, capa.data.finishCalendar);
@@ -151,6 +176,9 @@ const normalizarFecha = (fecha = new Date()) => {
   if (!fecha) {
     console.error("La fecha es inválida:", fecha);
     return null;
+  }
+  if (!(fecha instanceof Date)) {
+    fecha = new Date(fecha); // Convierte strings u otros formatos a Date
   }
   return new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate());
 };
