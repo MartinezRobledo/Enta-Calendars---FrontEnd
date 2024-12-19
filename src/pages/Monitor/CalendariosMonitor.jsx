@@ -1,22 +1,23 @@
 import { CircularProgress, Grid, TextField, Toolbar, Checkbox, ButtonGroup, Button } from '@mui/material';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SimplePaper } from '../../components';
 import { useAuthStore, useBD, useCalendarStore, useConfigEditStore } from '../../hooks';
 import { useNavigate } from 'react-router-dom';
-import Swal from 'sweetalert2';
 import { ExportBprelease, ExportCsv } from '../functions/documentCreator';
 import { createCalendarAutomation, createCalendarbp } from '../functions/calendarCreator';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 const CalendariosMonitor = () => {
-    const { calendars, status, error, deleteCalendar } = useCalendarStore();
-    const { templates, añoFiscal, deleteCalendarFetch } = useBD();
+    const { calendars, status, error } = useCalendarStore();
+    const { templates, añoFiscal, deleteCalendarFetch, getCalendars } = useBD();
     const { user } = useAuthStore();
     const { changeOnInitializeCapaEdit } = useConfigEditStore();
     const [search, setSearch] = useState(""); // Estado para el input de búsqueda
     const [selectedCalendars, setSelectedCalendars] = useState([]); // Calendarios seleccionados
     const [selectAll, setSelectAll] = useState(false);
     const [extension, setExtension] = useState('.bprelease'); // Extensión por defecto
-    const [selectedIds, setSelectedIds] = useState([])
+    // const [selectedIds, setSelectedIds] = useState([])
     const navigate = useNavigate();
 
     const verCalendar = (calendar) => {
@@ -79,6 +80,42 @@ const CalendariosMonitor = () => {
       else
         ExportCsv(createCalendarAutomation(diasFinales), calendar.titleStore);
     };
+
+    const eliminarCalendar = (calendar) => {
+        // Mostrar SweetAlert con los botones y personalización
+        Swal.fire({
+          icon: 'warning', // Ícono de advertencia (puedes cambiarlo a 'error' si prefieres)
+          title: '¿Seguro desea eliminar el calendario?',
+          text: `¿Está seguro de que desea eliminar el calendario: ${calendar.titleStore}?`, // Personaliza el texto
+          showCancelButton: true, // Muestra el botón de cancelar
+          confirmButtonText: 'Eliminar', // Texto del botón de confirmación
+          cancelButtonText: 'Cancelar', // Texto del botón de cancelación
+          confirmButtonColor: '#ff8a00', // Color del botón de confirmación
+          cancelButtonColor: '#d33', // Color del botón de cancelación
+          buttonsStyling: true, // Permite personalizar el estilo de los botones
+          reverseButtons: true,
+        }).then((result) => {
+          // Si el usuario confirma la acción (clic en "Eliminar")
+          if (result.isConfirmed) {
+            // Llamamos a la función para eliminar el calendario
+            // deleteCalendar(calendar._id);
+            const { data, error } = deleteCalendarFetch(calendar._id);
+      
+            if (error) {
+              console.error(error);
+            } else {
+              console.log(data);
+              Swal.fire(
+                'Eliminado', // Título de la ventana emergente de éxito
+                'El calendario ha sido eliminado correctamente.', // Mensaje
+                'success' // Ícono de éxito
+              );
+            }
+
+            getCalendars();
+          }
+        });
+      };
 
     const filteredCalendars = calendars.filter((calendar) =>
         calendar.titleStore.toLowerCase().includes(search.toLowerCase())

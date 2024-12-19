@@ -6,12 +6,12 @@ import Calendar from "../components/calendar/Calendar";
 import { useEffect, useRef, useState } from "react";
 import { SubmitCustom } from "../components/form/components/SubmitCustom";
 import ButtonGroup from "../components/button/ButtonGroup";
-import Swal from 'sweetalert2';
-import { styled } from '@mui/material/styles';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { ExportBprelease, ExportCsv } from "./functions/documentCreator";
 import { createCalendarAutomation, createCalendarbp, generarHashCalendario } from "./functions/calendarCreator";
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 const extensions = ['.bprelease', '.csv'];
 
@@ -53,7 +53,7 @@ export const CrearPage = () => {
   useEffect(() => {
     diasRef.current = diasActivos;
     capasRef.current = capas;
-  }, [diasActivos]);
+  }, [diasActivos, capas]);
 
   useEffect(() => {
     capaActualRef.current = capaActual;
@@ -83,6 +83,7 @@ export const CrearPage = () => {
     return () => {
       actualizarStore();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const actualizarStore = () => {
@@ -155,7 +156,7 @@ export const CrearPage = () => {
     }
 
     //Guardar las Capas del Store en la base de datos
-    const {result, error} = await saveConfig(calendario);
+    const error = await saveConfig(calendario);
     if(error) {
       console.log(error)
       Swal.fire({

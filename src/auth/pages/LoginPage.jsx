@@ -5,7 +5,8 @@ import LogoBP from '../../assets/images/BP_Logo.png'
 import LogoAA from '../../assets/images/Logo-Automation-Anywhere.webp'
 import { useAuthStore, useForm } from "../../hooks";
 import { useEffect } from "react";
-import Swal from "sweetalert2";
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 const loginFormFields = {
     loginEmail: '',

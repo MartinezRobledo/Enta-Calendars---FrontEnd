@@ -1,5 +1,5 @@
 import { RRule } from 'rrule';
-import { addDays, getMonth, startOfYear } from 'date-fns';
+import { addDays, getMonth } from 'date-fns';
 
 const diasHastaFinMes = (actual) => {
   let dias = []

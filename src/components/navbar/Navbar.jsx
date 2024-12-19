@@ -1,4 +1,4 @@
-import * as React from 'react';
+// import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,10 +12,9 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import Logo from '../../assets/images/logo-enta-horizontal-blanco-h100.png'
-// import Logo from '../../assets/images/Blue_Prism_logo.png'
-// import Logo from '../../assets/images/logo-enta-horizontal-h100-Calendars.png'
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../../hooks';
+import { useState } from 'react';
 
 const pages = [{title:'Crear', path:'/crear'}, {title:'Monitor', path:'/monitor'}, {title:'Editar', path:'/editar'}];
 const settings = ['Usuario', 'Salir'];
@@ -23,8 +22,8 @@ const settings = ['Usuario', 'Salir'];
 export const Navbar = ()=> {
   const { startLogout, user } = useAuthStore();
 
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);

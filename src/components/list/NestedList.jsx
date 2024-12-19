@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { Fragment, useState } from "react";
 import ListSubheader from "@mui/material/ListSubheader";
 import List from "@mui/material/List";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -58,7 +58,7 @@ export default function NestedList({ onSelect }) {
 
   const renderOptions = (items, depth = 0) =>
     items.map((item) => (
-      <React.Fragment key={item.value}>
+      <Fragment key={item.value}>
         <ListItemButton
           sx={{ pl: depth * 4 }}
           selected={selected === item.value}
@@ -77,7 +77,7 @@ export default function NestedList({ onSelect }) {
             </List>
           </Collapse>
         )}
-      </React.Fragment>
+      </Fragment>
     ));
 
   return (

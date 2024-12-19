@@ -42,11 +42,11 @@ export const useBD = () => {
 
     const saveConfig = async(calendario) => {
         try{
-            const { data } = await calendarApi.post('/calendars', calendario);
-            return { data, error:null };
+            await calendarApi.post('/calendars', calendario);
+            return null;
         }
         catch (error) {
-            return { data: null, error };
+            return error;
         }
     }
 

@@ -1,42 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { calendarApi } from '../../api';
 
-export const fetchCalendars = createAsyncThunk('calendars/fetchCalendars', async (user) => {
+export const fetchCalendars = createAsyncThunk('calendars/fetchCalendars', async (user, { rejectWithValue }) => {
     try {
       const response = await calendarApi.get('/calendars/'+ user);
       if (!Array.isArray(response.data.calendars)) {
         throw new Error('El formato de datos del API no es válido');
       }
-      
-      const calendars = response.data.calendars.map(calendar => {
-        return {
-          titleStore: calendar.titleStore,
-          capasStore: calendar.capasStore.map(capa => {
-            return {
-              id: capa.id,
-              title: capa.title,
-              data: {
-                initCalendar: new Date(capa.data.initCalendar),
-                finishCalendar: new Date(capa.data.finishCalendar),
-                byWeekday: capa.data.byWeekday,
-                byMonthday: capa.data.byMonthday,
-                byMonthdayStr: capa.data.byMonthdayStr,
-                allDays: capa.data.allDays,
-                agrupar: capa.data.agrupar,
-                withHolidays: capa.data.withHolidays,
-              },
-            dependienteDe: capa.dependienteDe,
-            esPadre: capa.esPadre,
-            dias: capa.dias,
-            }
-          }),
-          capaActualStore: calendar.capaActualStore,
-          aditionalDaysToAdd: calendar.aditionalDaysToAdd,
-          aditionalDaysToRemove: calendar.aditionalDaysToRemove,
-          diasActivosStore: calendar.diasActivosStore,
-          fechaActualizacion: calendar.fechaActualizacion,
-        }
-      });
+
       return response.data.calendars;
     } catch(error) {
       console.error(error);

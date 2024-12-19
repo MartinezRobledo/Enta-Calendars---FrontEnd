@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import { Grid, Typography, IconButton, Checkbox } from '@mui/material';
@@ -6,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useTheme } from '@mui/material/styles';
 
-export const SimplePaper = ({ papers = [], handleClick, handleDownload, handleDelete, selectedIds = [], setSelectedIds, selectAll, setSelectAll }) => {
+export const SimplePaper = ({ papers = [], handleClick, handleDownload, handleDelete, selectedIds = [], setSelectedIds, setSelectAll }) => {
   const theme = useTheme();
 
   const handleCheckboxChange = (id, nextCheck) => {

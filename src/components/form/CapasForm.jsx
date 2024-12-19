@@ -1,12 +1,13 @@
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { CalendarForm } from './Form';
 import { Tab, Tabs, Box, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
-import Swal from 'sweetalert2';
 import { useBD } from '../../hooks';
 import { encontrarDiasCoincidentes, filterHolidays, normalizeByMonthday, normalizeByMonthdayDependence, recortarDiasPorConfiguracion, Rules } from './functions/Rules';
 import AutocompleteCustom from './components/AutocompleteCustom';
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 function tieneCiclo(capas, origen, destino) {
   if (!destino) return false; 
@@ -266,7 +267,7 @@ const agregarDependencia = (dependienteDe) => {
     setDiasActivos(diasActivos);
     setCapas(capas);
     setCapaActual(capaActual);
-  }, [diasActivos, setDiasActivos]);
+  }, [capas, diasActivos, setDiasActivos, capaActual, setCapas, setCapaActual]);
 
   return (
     <Box>

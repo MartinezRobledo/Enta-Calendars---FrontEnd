@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { LoginPage } from '../auth';
 import { CrearPage, MonitorPage, EditarPage } from '../pages';
-import { useAuthStore, useUiStore, useConfigStore, useBD } from '../hooks';
+import { useAuthStore, useUiStore, useBD } from '../hooks';
 import { useEffect, useState } from 'react'; // Asegurándote de importar useState y useEffect
 import { Box } from '@mui/material';
 import { SpinModal } from '../components/spinner/spinModal';
@@ -31,7 +31,7 @@ const AppInitializer = ({ onInitialized }) => {
           }
       };
       cargarDatos();
-  }, [activateSpin, desactivateSpine, startLoadingHolidays, startLoadingTemplates]);
+  }, [activateSpin, desactivateSpine, startLoadingHolidays, startLoadingTemplates, onInitialized]);
 
   if (!isInitialized) {
       // Mostrar un spinner mientras se inicializan los datos
@@ -51,6 +51,7 @@ export const AppRouter = () => {
 
   useEffect(() => {
     checkToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (status === 'checking') {

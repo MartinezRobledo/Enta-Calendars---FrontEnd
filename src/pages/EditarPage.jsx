@@ -6,12 +6,13 @@ import Calendar from "../components/calendar/Calendar";
 import { useEffect, useRef, useState } from "react";
 import { SubmitCustom } from "../components/form/components/SubmitCustom";
 import ButtonGroup from "../components/button/ButtonGroup";
-import Swal from 'sweetalert2';
-import { styled } from '@mui/material/styles';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveAltIcon from '@mui/icons-material/SaveAlt';
 import { ExportBprelease, ExportCsv } from "./functions/documentCreator";
 import { createCalendarAutomation, createCalendarbp, generarHashCalendario } from "./functions/calendarCreator";
+import Swal from 'sweetalert2/dist/sweetalert2.js';
+// import { styled } from '@mui/system';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 const extensions = ['.bprelease', '.csv'];
 
@@ -57,9 +58,11 @@ export const EditarPage = () => {
 
   useEffect(() => {
     // Función de limpieza que se ejecuta al desmontar
+     
     return () => {
       actualizarStore();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const actualizarStore = () => {
@@ -122,12 +125,8 @@ export const EditarPage = () => {
       fechaActualizacion: new Date(),
     }
 
-    const { data, errorDel } = await deleteCalendarFetch(_id);
-    if(errorDel)
-      console.error("No se pudo eliminar el calendario previo", error);
-
     //Guardar las Capas del Store en la base de datos
-    const {result, error} = await saveConfig(calendario);
+    const error = await saveConfig(calendario);
     if(error) {
       Swal.fire({
         icon: 'error',
@@ -141,13 +140,18 @@ export const EditarPage = () => {
     }
     else
     Swal.fire({
-      icon: 'success',
-      title: 'Se guardó el calendario',
-      text: 'Se pudo guardar el calendario satisfactoriamente',
-      confirmButtonText: 'Aceptar',
-      buttonsStyling: true, // Permite personalizar el estilo del botón
-      confirmButtonColor: '#ff8a00'
-    });
+        icon: 'success',
+        title: 'Se guardó el calendario',
+        text: 'Se pudo guardar el calendario satisfactoriamente',
+        confirmButtonText: 'Aceptar',
+        buttonsStyling: true, // Permite personalizar el estilo del botón
+        confirmButtonColor: '#ff8a00'
+      });
+
+    const errorDel = await deleteCalendarFetch(_id);
+    if(errorDel)
+      console.error("No se pudo eliminar el calendario previo", error);
+
     getCalendars();
   }
 

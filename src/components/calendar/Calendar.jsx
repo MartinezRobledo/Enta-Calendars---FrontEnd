@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react';
 import './Calendar.css';
-import { useConfigStore } from '../../hooks';
 import { isSameDay } from 'date-fns';
 
 const nombresMeses = [

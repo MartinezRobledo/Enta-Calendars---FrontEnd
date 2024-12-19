@@ -36,6 +36,7 @@ export const MonitorPage = () => {
 
   useEffect(() => {
     getCalendars();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
