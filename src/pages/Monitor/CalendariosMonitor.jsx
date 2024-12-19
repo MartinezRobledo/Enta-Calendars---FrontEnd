@@ -9,7 +9,7 @@ import Swal from 'sweetalert2/dist/sweetalert2.js';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
 const CalendariosMonitor = () => {
-    const { calendars, status, error } = useCalendarStore();
+    const { calendars, status, error, deleteCalendar } = useCalendarStore();
     const { templates, añoFiscal, deleteCalendarFetch, getCalendars } = useBD();
     const { user } = useAuthStore();
     const { changeOnInitializeCapaEdit } = useConfigEditStore();
@@ -112,7 +112,7 @@ const CalendariosMonitor = () => {
               );
             }
 
-            getCalendars();
+            deleteCalendar(calendar._id);
           }
         });
       };
