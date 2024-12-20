@@ -25,11 +25,17 @@ function formatDateAutomation(date) {
 
 // Obtengo todas las fechas que no son las fechas de ejecución
 function fechasToBp(fechasDeEjecucion = [], fechaInicio, fechaFin) {
-    const todasLasFechas = eachDayOfInterval({ start: fechaInicio, end: fechaFin });
+    // Asegurar que las fechas sean objetos Date
+    const fechasDeEjecucionDates = fechasDeEjecucion.map(fecha => new Date(fecha));
+    const fechaInicioDate = new Date(fechaInicio);
+    const fechaFinDate = new Date(fechaFin);
 
-    // Filtrar las fechas excluyendo las que están en fechasExcluidas
+    // Generar todas las fechas dentro del intervalo
+    const todasLasFechas = eachDayOfInterval({ start: fechaInicioDate, end: fechaFinDate });
+
+    // Filtrar las fechas excluyendo las que están en fechasDeEjecucion
     const otherDates = todasLasFechas.filter(fecha =>
-    !fechasDeEjecucion.some(excluir => isSameDay(fecha, excluir))
+        !fechasDeEjecucionDates.some(excluir => isSameDay(fecha, excluir))
     );
 
     return otherDates;
@@ -77,6 +83,7 @@ export const createCalendarbp = ( template = {}, fechas = [], title, user, inici
     const startDate = new Date(Number(año) + 1, 0, 1);
     
     const otherDates = fechasToBp(fechas, inicio, fin);
+
     const daysOfNextYear = [];
     for (let i = 0; i < 366; i++) {
         const other = new Date(startDate);

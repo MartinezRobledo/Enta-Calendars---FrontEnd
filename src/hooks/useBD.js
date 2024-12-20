@@ -50,6 +50,16 @@ export const useBD = () => {
         }
     }
 
+    const updateConfig = async(_id, calendario) => {
+        try{
+            await calendarApi.put('/calendars', {_id, calendario});
+            return null;
+        }
+        catch (error) {
+            return error;
+        }
+    }
+
     const deleteCalendarFetch = async(id) => {
         try {
             const { data } = await calendarApi.delete('/calendars/'+id);
@@ -73,6 +83,7 @@ export const useBD = () => {
         startLoadingHolidays,
         startLoadingTemplates,
         saveConfig,
+        updateConfig,
         getCalendars,
         deleteCalendarFetch,
     }

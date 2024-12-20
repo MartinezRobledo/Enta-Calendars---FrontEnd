@@ -35,7 +35,7 @@ export const EditarPage = () => {
   } = useConfigEditStore();
 
   const { user } = useAuthStore();
-  const { templates, añoFiscal, saveConfig, getCalendars, deleteCalendarFetch } = useBD();
+  const { templates, añoFiscal, updateConfig, getCalendars } = useBD();
   const {isSpinActive} = useUiStore();
   const [showButtons, setShowButtons] = useState(false);
   const [diasActivos, setDiasActivos] = useState(diasActivosStore);
@@ -126,7 +126,7 @@ export const EditarPage = () => {
     }
 
     //Guardar las Capas del Store en la base de datos
-    const error = await saveConfig(calendario);
+    const error = await updateConfig(_id, calendario);
     if(error) {
       Swal.fire({
         icon: 'error',
@@ -148,9 +148,9 @@ export const EditarPage = () => {
         confirmButtonColor: '#ff8a00'
       });
 
-    const errorDel = await deleteCalendarFetch(_id);
-    if(errorDel)
-      console.error("No se pudo eliminar el calendario previo", error);
+    // const errorDel = await deleteCalendarFetch(_id);
+    // if(errorDel)
+    //   console.error("No se pudo eliminar el calendario previo", error);
 
     getCalendars();
   }
@@ -165,13 +165,23 @@ export const EditarPage = () => {
         )
     );
 
-    const inicio = new Date(Math.min(...capasStore.map(capa => {
-      return capa.data.initCalendar;
-    })));
-
-    const fin = new Date(Math.max(...capasStore.map(capa => {
-      return capa.data.finishCalendar;
-    })));
+    const inicio = new Date(
+      Math.min(
+        ...capasStore.map(capa => {
+          const timestamp = Date.parse(capa.data.initCalendar);
+          return isNaN(timestamp) ? Infinity : timestamp; // Asegura valores válidos
+        })
+      )
+    ).toISOString(); // Formato ISO 8601
+    
+    const fin = new Date(
+      Math.max(
+        ...capasStore.map(capa => {
+          const timestamp = Date.parse(capa.data.finishCalendar);
+          return isNaN(timestamp) ? -Infinity : timestamp; // Asegura valores válidos
+        })
+      )
+    ).toISOString(); // Formato ISO 8601
 
     if(ext == '.bprelease')
       ExportBprelease(createCalendarbp(templates, diasFinales, title, user.name, inicio, fin, añoFiscal ), title );
