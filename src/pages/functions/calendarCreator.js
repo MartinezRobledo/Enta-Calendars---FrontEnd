@@ -88,17 +88,18 @@ export const createCalendarbp = ( template = {}, fechas = [], title, user, inici
     
     const otherDates = fechasToBp(fechas, inicio, fin);
 
-    const daysOfNextYear = [];
-    for (let i = 0; i < 366; i++) {
-        const other = new Date(startDate);
-        other.setDate(startDate.getDate() + i);
-        daysOfNextYear.push(other); // Formato YYYY-MM-DD
-    }
+    // const daysOfNextYear = [];
+    // for (let i = 0; i < 366; i++) {
+    //     const other = new Date(startDate);
+    //     other.setDate(startDate.getDate() + i);
+    //     daysOfNextYear.push(other); // Formato YYYY-MM-DD
+    // }
 
     // Crear la estructura de <other-holidays> con las fechas en formato <other-date>
     const otherHolidays = '<other-holidays>\n' +
     otherDates.map(fecha => `<other-date value='${new Date(fecha).toISOString().split('T')[0]}' />\n`).join('') +
-    daysOfNextYear.map(fecha => `<other-date value='${new Date(fecha).toISOString().split('T')[0]}' />\n`).join('') +
+    `<other-date value='${new Date(startDate).toISOString().split('T')[0]}' />\n` +
+    // daysOfNextYear.map(fecha => `<other-date value='${new Date(fecha).toISOString().split('T')[0]}' />\n`).join('') +
     '</other-holidays>';
 
     // Reemplazo other holidays
