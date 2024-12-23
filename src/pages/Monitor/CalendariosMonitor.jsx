@@ -65,15 +65,25 @@ const CalendariosMonitor = () => {
     const descargarCalendar = (calendar, ext) => {
       // Lógica para descargar un calendario con la extensión seleccionada
       const diasFinales = [...new Set([...calendar.diasActivosStore, ...calendar.aditionalDaysToAdd])]
-            .filter(day => !calendar.aditionalDaysToRemove.includes(day));
-        
-      const inicio = new Date(Math.min(...calendar.capasStore.map(capa => {
-        return capa.data.initCalendar;
-      })));
-  
-      const fin = new Date(Math.max(...calendar.capasStore.map(capa => {
-        return capa.data.finishCalendar;
-      })));
+        .filter(day => !calendar.aditionalDaysToRemove.includes(day));
+
+    const inicio = new Date(
+        Math.min(
+            ...calendar.capasStore.map(capa => {
+            const timestamp = Date.parse(capa.data.initCalendar);
+            return isNaN(timestamp) ? Infinity : timestamp; // Asegura valores válidos
+            })
+        )
+        ).toISOString(); // Formato ISO 8601
+            
+    const fin = new Date(
+    Math.max(
+        ...calendar.capasStore.map(capa => {
+        const timestamp = Date.parse(capa.data.finishCalendar);
+        return isNaN(timestamp) ? -Infinity : timestamp; // Asegura valores válidos
+        })
+    )
+    ).toISOString(); // Formato ISO 8601
       
       if(ext == '.bprelease')
         ExportBprelease(createCalendarbp(templates, diasFinales, calendar.titleStore, user.name, inicio, fin, añoFiscal), calendar.titleStore);
@@ -104,7 +114,6 @@ const CalendariosMonitor = () => {
             if (error) {
               console.error(error);
             } else {
-              console.log(data);
               Swal.fire(
                 'Eliminado', // Título de la ventana emergente de éxito
                 'El calendario ha sido eliminado correctamente.', // Mensaje

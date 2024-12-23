@@ -104,11 +104,14 @@ const agregarCapa = () => {
 };
 
 const actualizarCapaYDependientes = (indiceCapa, nuevasCapas) => {
-  const capaActual = nuevasCapas[indiceCapa];
+  const capaActual = { ...nuevasCapas[indiceCapa] }; // Crear una copia inmutable de la capa actual
 
-  // Recalcula los días de la capa actual
+  // Recalcular los días de la capa actual
   capaActual.dias = capaActual.dependienteDe
-      ? recortarDiasPorConfiguracion(nuevasCapas[capaActual.dependienteDe - 1].dias, capaActual)
+      ? recortarDiasPorConfiguracion(
+          nuevasCapas[capaActual.dependienteDe - 1].dias,
+          capaActual
+      )
       : Rules(
           capaActual.data.initCalendar,
           capaActual.data.finishCalendar,
@@ -120,8 +123,16 @@ const actualizarCapaYDependientes = (indiceCapa, nuevasCapas) => {
       capaActual.dias = filterHolidays(capaActual.dias, holidays);
   }
 
-  if(capaActual.data.agrupar)
-    capaActual.dias = encontrarDiasCoincidentes(capaActual.dias, Object.keys(capaActual.data.byWeekday).length, añoFiscal);
+  if (capaActual.data.agrupar) {
+      capaActual.dias = encontrarDiasCoincidentes(
+          capaActual.dias,
+          Object.keys(capaActual.data.byWeekday).length,
+          añoFiscal
+      );
+  }
+
+  // Asigna la capa modificada de vuelta al array
+  nuevasCapas[indiceCapa] = capaActual;
 
   // Si la capa tiene hijos, actualízalos recursivamente
   if (capaActual.esPadre.length > 0) {
@@ -130,6 +141,7 @@ const actualizarCapaYDependientes = (indiceCapa, nuevasCapas) => {
       });
   }
 };
+
 
 const actualizarDatosCapa = (datosActualizados) => {
   setCapas((prev) => {

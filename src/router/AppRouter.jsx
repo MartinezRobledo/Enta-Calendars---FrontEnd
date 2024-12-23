@@ -72,7 +72,7 @@ export const AppRouter = () => {
     <Routes>
       {status === 'no-authenticated' ? (
         <>
-          <Route path="/auth/*" element={<LoginPage />} />
+          <Route path="/auth/login" element={<LoginPage />} />
           <Route path="/*" element={<Navigate to="/auth/login" />} />
         </>
       ) : (
@@ -80,7 +80,7 @@ export const AppRouter = () => {
           <Route path="/crear" element={<CrearPage />} />
           <Route path="/monitor" element={<MonitorPage />} />
           <Route path="/editar" element={<EditarPage />} />
-          <Route path="/*" element={<Navigate to="/crear" />} />
+          <Route path="/*" element={<Navigate to="/monitor" />} />
         </>
       )}
     </Routes>

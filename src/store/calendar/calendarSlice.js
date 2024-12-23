@@ -1,19 +1,41 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { calendarApi } from '../../api';
 
-export const fetchCalendars = createAsyncThunk('calendars/fetchCalendars', async (user, { rejectWithValue }) => {
-    try {
-      const response = await calendarApi.get('/calendars/'+ user);
-      if (!Array.isArray(response.data.calendars)) {
-        throw new Error('El formato de datos del API no es válido');
-      }
-
-      return response.data.calendars;
-    } catch(error) {
-      console.error(error);
-      return rejectWithValue(error.response?.data || 'Error desconocido');
+// Función para convertir las fechas en formato ISO a objetos Date
+const convertDatesToObjects = (calendars) => {
+  return calendars.map(calendar => {
+    if (calendar.capasStore) {
+      calendar.capasStore.forEach(capa => {
+        if (capa.dias) {
+          capa.dias = capa.dias.map(fecha => new Date(fecha));
+        }
+        if (capa.data) {
+          capa.data.initCalendar = new Date(capa.data.initCalendar);
+          capa.data.finishCalendar = new Date(capa.data.finishCalendar);
+        }
+      });
     }
+    if (calendar.diasActivosStore) {
+      calendar.diasActivosStore = calendar.diasActivosStore.map(fecha => new Date(fecha));
+    }
+    calendar.fechaActualizacion = new Date(calendar.fechaActualizacion);
+    return calendar;
   });
+};
+
+export const fetchCalendars = createAsyncThunk('calendars/fetchCalendars', async (user, { rejectWithValue }) => {
+  try {
+    const response = await calendarApi.get('/calendars/' + user);
+    if (!Array.isArray(response.data.calendars)) {
+      throw new Error('El formato de datos del API no es válido');
+    }
+    const processedCalendars = convertDatesToObjects(response.data.calendars);
+    return processedCalendars;
+  } catch (error) {
+    console.error(error);
+    return rejectWithValue(error.response?.data || 'Error desconocido');
+  }
+});
 
 export const calendarSlice = createSlice({
     name: 'calendars',

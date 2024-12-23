@@ -12,7 +12,6 @@ export const useCalendarStore = () => {
     } = useSelector( state => state.calendar );
 
     const deleteCalendar = async(id) => {
-        console.log("Eliminando calendario del store");
         dispatch(onDeleteCalendar(id));
     }
 

@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux"
-import { onChangeAditionalDaysToAdd, 
+import { onChange_id, onChangeAditionalDaysToAdd, 
         onChangeAditionalDaysToRemove,
         onChangeCapaActual,
         onChangeCapas,
@@ -51,6 +51,10 @@ export const useConfigEditStore = ()=> {
         dispatch(onInitializeCapaEdit(capa));
     }
 
+    const change_id = (id) => {
+        dispatch(onChange_id(id));
+    }
+
     return {
         //* Propiedades
         titleStore,
@@ -70,5 +74,6 @@ export const useConfigEditStore = ()=> {
         changeDiasActivos,
         changeCapaActual,
         changeOnInitializeCapaEdit,
+        change_id,
     }
 }

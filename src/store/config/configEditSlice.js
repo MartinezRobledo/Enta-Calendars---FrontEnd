@@ -36,7 +36,10 @@ export const configEditSlice = createSlice({
         },
         onChangeTitle: (state, { payload }) => {
             state.titleStore = payload;
-        },      
+        },
+        onChange_id: (state, { payload }) => {
+            state._id = payload
+        },  
         onChangeAditionalDaysToAdd: (state, { payload }) => {
             // Verifica si el día ya está en la lista
             const exists = state.aditionalDaysToAdd.some((day) => isSameDay(day, payload));
@@ -94,4 +97,5 @@ export const {
     onChangeDiasActivos,
     onChangeCapas,
     onChangeCapaActual,
+    onChange_id,
 } = configEditSlice.actions;

@@ -15,9 +15,10 @@ function formatDateBP(date) {
 
 function formatDateAutomation(date) {
     // Obtener la fecha en formato 'YYYY-MM-DD HH:mm:ss'
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11, por eso sumamos 1
-    const day = String(date.getDate()).padStart(2, '0');
+    const dateFormated = new Date(date);
+    const year = dateFormated.getFullYear();
+    const month = String(dateFormated.getMonth() + 1).padStart(2, '0'); // Los meses van de 0 a 11, por eso sumamos 1
+    const day = String(dateFormated.getDate()).padStart(2, '0');
 
     // Formato deseado: 'YYYY-MM-DD'
     return `${year}-${month}-${day}`;
@@ -44,9 +45,12 @@ function fechasToBp(fechasDeEjecucion = [], fechaInicio, fechaFin) {
 export async function generarHashCalendario(diasFinales, cliente) {
     // Normaliza el array ordenándolo
     const diasOrdenados = [...diasFinales].sort();
+
+    // Asegurar que las fechas sean objetos Date
+    const diasOrdenadosDates = diasOrdenados.map(fecha => new Date(fecha));
     
     // Convierte a string
-    const dataString = JSON.stringify(diasOrdenados) + cliente;
+    const dataString = JSON.stringify(diasOrdenadosDates) + cliente;
     const encoder = new TextEncoder();
     const data = encoder.encode(dataString);
 

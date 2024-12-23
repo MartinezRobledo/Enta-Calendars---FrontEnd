@@ -26,6 +26,7 @@ export const EditarPage = () => {
           capaActualStore, 
           _id, 
           isDisabled,
+          change_id,
           changeTitle, 
           changeDiasActivos,
           changeCapas,
@@ -104,7 +105,7 @@ export const EditarPage = () => {
   const guardar = async() => {
     actualizarStore();
 
-    const diasFinales = [...new Set([...diasActivos, ...aditionalDaysToAdd])]
+    const diasFinales = [...new Set([...diasActivos.map(dia => new Date(dia)), ...aditionalDaysToAdd.map(dia => new Date(dia))])]
     .filter(
         day => !aditionalDaysToRemove.some(removedDay => 
             new Date(day).getTime() === new Date(removedDay).getTime()
@@ -126,20 +127,16 @@ export const EditarPage = () => {
     }
 
     //Guardar las Capas del Store en la base de datos
-    const error = await updateConfig(_id, calendario);
-    if(error) {
+    const {data, error} = await updateConfig(_id, calendario);
+    if(!error) {
+      const updatedCalendar = data.data.calendar; // El calendario retornado por el backend
+      changeTitle(updatedCalendar.titleStore);
+      changeCapas(updatedCalendar.capasStore);
+      changeCapaActual(updatedCalendar.capaActualStore);
+      changeDiasActivos(updatedCalendar.diasActivosStore);
+      change_id(updatedCalendar._id);
+
       Swal.fire({
-        icon: 'error',
-        title: 'No se pudo guardar el calendario',
-        text: error.response.data.msg,
-        confirmButtonText: 'Entendido',
-        buttonsStyling: true, // Permite personalizar el estilo del botón
-        confirmButtonColor: '#ff8a00'
-      })
-      return;
-    }
-    else
-    Swal.fire({
         icon: 'success',
         title: 'Se guardó el calendario',
         text: 'Se pudo guardar el calendario satisfactoriamente',
@@ -148,11 +145,19 @@ export const EditarPage = () => {
         confirmButtonColor: '#ff8a00'
       });
 
-    // const errorDel = await deleteCalendarFetch(_id);
-    // if(errorDel)
-    //   console.error("No se pudo eliminar el calendario previo", error);
+      await getCalendars();
 
-    getCalendars();
+      return;
+    }
+    else
+      Swal.fire({
+        icon: 'error',
+        title: 'No se pudo guardar el calendario',
+        text: error.response.data.msg,
+        confirmButtonText: 'Entendido',
+        buttonsStyling: true, // Permite personalizar el estilo del botón
+        confirmButtonColor: '#ff8a00'
+      });
   }
 
   const exportar = async(ext) => {

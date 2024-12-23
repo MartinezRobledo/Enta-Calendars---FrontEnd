@@ -133,13 +133,23 @@ export const CrearPage = () => {
         )
     );
 
-    const inicio = new Date(Math.min(...capas.map(capa => {
-      return capa.data.initCalendar;
-    })));
-
-    const fin = new Date(Math.max(...capas.map(capa => {
-      return capa.data.finishCalendar;
-    })));
+    const inicio = new Date(
+      Math.min(
+        ...capas.map(capa => {
+          const timestamp = Date.parse(capa.data.initCalendar);
+          return isNaN(timestamp) ? Infinity : timestamp; // Asegura valores válidos
+        })
+      )
+    )
+    
+    const fin = new Date(
+      Math.max(
+        ...capas.map(capa => {
+          const timestamp = Date.parse(capa.data.finishCalendar);
+          return isNaN(timestamp) ? -Infinity : timestamp; // Asegura valores válidos
+        })
+      )
+    )
 
     //Generar Hash para ID con días finales
     const idBD = await generarHashCalendario(diasFinales, user.name);
@@ -148,10 +158,10 @@ export const CrearPage = () => {
       cliente: user.name,
       titleStore: titleRef.current,
       capasStore: capas,
-      capaActualStore: capaActualStore,
+      capaActualStore: capaActual,
       aditionalDaysToAdd: aditionalDaysToAdd,
       aditionalDaysToRemove: aditionalDaysToRemove,
-      diasActivosStore: diasActivosStore,
+      diasActivosStore: diasActivos,
       fechaActualizacion: new Date(),
     }
 

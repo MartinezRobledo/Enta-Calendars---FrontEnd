@@ -52,11 +52,11 @@ export const useBD = () => {
 
     const updateConfig = async(_id, calendario) => {
         try{
-            await calendarApi.put('/calendars', {_id, calendario});
-            return null;
+            const data = await calendarApi.put('/calendars', {_id, calendario});
+            return {data, error:null};
         }
         catch (error) {
-            return error;
+            return {data:null, error};
         }
     }
 
