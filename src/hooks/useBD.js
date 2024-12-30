@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { onInitializeCapa, onStartLoadingHolidays, onStartLoadingTemplates } from "../store";
+import { onInitializeCapa, onInitializeCapaEdit, onStartLoadingHolidays, onStartLoadingTemplates } from "../store";
 import { calendarApi } from "../api";
 import { fetchCalendars } from "../store/calendar/calendarSlice";
 import { useAuthStore } from "./useAuthStore";
@@ -12,7 +12,6 @@ export const useBD = () => {
     const {
         holidays,
         templates,
-        añoFiscal,
     } = useSelector((state) => state.start); // Accede a startDataSlice
 
     const startLoadingTemplates = async() => {
@@ -27,13 +26,29 @@ export const useBD = () => {
     //Traigo feridados del backend y los guardo en el store.
     const startLoadingHolidays = async () => {
         try {
-            const { data } = await calendarApi.get('/holidays/last');
-            if (!data || !data.feriados || !data.feriados.feriados_ar) {
-                throw new Error('Formato de datos inválido');
+            let response = await calendarApi.get('/holidays/last');
+            let data = response.data;
+            if (!data.feriados.feriados_ar) {
+                throw new Error('No se pudo obtener los feriados solicitados');
             }
-            const holidays = data.feriados.feriados_ar.map((day) => new Date(day));
-            dispatch(onStartLoadingHolidays({ holidays, año: data.feriados.año }));
-            dispatch(onInitializeCapa(data.feriados.año));
+            const lastholidays = data.feriados.feriados_ar.map((day) => new Date(day));
+            const lastyear = data.feriados.año;
+            
+            response = await calendarApi.get('/holidays/'+(lastyear-1));
+            data = response.data;
+
+            if (!data.feriados.feriados_ar) {
+                throw new Error('No se pudo obtener los feriados solicitados');
+            }
+            const penultimateholidays = data.feriados.feriados_ar.map((day) => new Date(day));
+            const penultimateyear = data.feriados.año;
+
+            dispatch(onStartLoadingHolidays([
+                { año: penultimateyear, holidays: penultimateholidays },
+                { año: lastyear, holidays: lastholidays }, 
+            ]));
+            
+            dispatch(onInitializeCapa([penultimateyear, lastyear]));
         } catch (error) {
             console.error("Error al cargar los feriados:", error);
             throw error; // Propaga el error para manejarlo en el componente
@@ -53,10 +68,10 @@ export const useBD = () => {
     const updateConfig = async(_id, calendario) => {
         try{
             const data = await calendarApi.put('/calendars', {_id, calendario});
-            return {data, error:null};
+            return null;
         }
         catch (error) {
-            return {data:null, error};
+            return error;
         }
     }
 
@@ -76,7 +91,6 @@ export const useBD = () => {
     return {
         //* Propiedades
         holidays,
-        añoFiscal,
         templates,
 
         //* Métodos

@@ -1,5 +1,5 @@
-import { useEffect, useMemo } from 'react';
-import { CalendarForm } from './Form';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Form } from './Form';
 import { Tab, Tabs, Box, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
@@ -19,17 +19,23 @@ function tieneCiclo(capas, origen, destino) {
   return false;
 }
 
-export const CapasForm = ({ isDisabled, capaActual, capas, setDiasActivos, setCapaActual, setCapas }) => {
-  
-  const { añoFiscal, holidays } = useBD();
+export const CapasForm = ({ capaActualInicial, capasInicial, isDisabled, actualizarConfig, año, holidays }) => {
+
+const [capas, setCapas] = useState([...capasInicial]);
+const [capaActual, setCapaActual] = useState(capaActualInicial);
+
+useEffect(() => {
+  const diasActivos = capas.filter((capa) => capa.esPadre.length === 0).map((capa) => capa.dias).flat();
+  actualizarConfig(capas, capaActual, diasActivos);
+}, [capas]);
 
 const agregarCapa = () => {
   const nuevaCapa = {
     id: capas.length + 1,
     title: `Capa ${capas.length + 1}`,
     data: {
-      initCalendar: new Date(añoFiscal, 0, 1),
-      finishCalendar: new Date(añoFiscal, 11, 31),
+      initCalendar: new Date(año, 0, 1),
+      finishCalendar: new Date(año, 11, 31),
       byWeekday: {},
       byMonthday: [],
       byMonthdayStr: '',
@@ -45,7 +51,7 @@ const agregarCapa = () => {
   setCapaActual(capas.length);
 };
 
-  const eliminarCapa = (index) => {
+const eliminarCapa = (index) => {
     if (capas.length === 1) return; // No permitir eliminar si solo queda una capa
 
     const idEliminado = capas[index].id;
@@ -127,7 +133,7 @@ const actualizarCapaYDependientes = (indiceCapa, nuevasCapas) => {
       capaActual.dias = encontrarDiasCoincidentes(
           capaActual.dias,
           Object.keys(capaActual.data.byWeekday).length,
-          añoFiscal
+          año
       );
   }
 
@@ -141,7 +147,6 @@ const actualizarCapaYDependientes = (indiceCapa, nuevasCapas) => {
       });
   }
 };
-
 
 const actualizarDatosCapa = (datosActualizados) => {
   setCapas((prev) => {
@@ -268,21 +273,8 @@ const agregarDependencia = (dependienteDe) => {
     });
 };
 
-  const diasActivos = useMemo(() => {
-    return capas
-      .filter((capa) => capa.esPadre.length === 0)
-      .map((capa) => capa.dias)
-      .flat();
-  }, [capas]);
-
-  useEffect(() => {
-    setDiasActivos(diasActivos);
-    setCapas(capas);
-    setCapaActual(capaActual);
-  }, [capas, diasActivos, setDiasActivos, capaActual, setCapas, setCapaActual]);
-
   return (
-    <Box>
+    <>
       <Tabs
         value={capaActual}
         onChange={(_, newValue) => setCapaActual(newValue)}
@@ -320,25 +312,24 @@ const agregarDependencia = (dependienteDe) => {
                   />
                 </span>
               </Box>
-            }
-          />
-        ))}
-        <Tab icon={
-          <AddIcon 
-            sx={{
-              cursor: 'pointer',
-              color: 'gray',
-              '&:hover': { color: 'lightgreen' },
-              transition: 'color 0.2s ease-in-out',
-            }}
-            />
-          } 
-          onClick={agregarCapa} 
-          disabled={isDisabled}
+          }
         />
+      ))}
+      <Tab icon={
+        <AddIcon 
+          sx={{
+            cursor: 'pointer',
+            color: 'gray',
+            '&:hover': { color: 'lightgreen' },
+            transition: 'color 0.2s ease-in-out',
+          }}
+          />
+        } 
+        onClick={agregarCapa} 
+        disabled={isDisabled}
+      />
       </Tabs>
-      <CalendarForm
-        añoFiscal={añoFiscal}
+      <Form
         data={
           capas[capaActual]?.data || 
           console.error("La capa actual esta vacía o apunta a una dirección inválida.\nCapa actual: ", capaActual)} // Manejo seguro
@@ -356,6 +347,6 @@ const agregarDependencia = (dependienteDe) => {
           width={300}
         />
       </Box>
-    </Box>
+    </>
   );
 };

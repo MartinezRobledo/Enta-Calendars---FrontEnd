@@ -5,80 +5,96 @@ export const configSlice = createSlice({
     name: 'config',
     initialState: {
         titleStore: '',
-        capasStore: [],
-        capaActualStore: 0,
-        aditionalDaysToAdd: [],
-        aditionalDaysToRemove: [],
-        diasActivosStore: [],
+        añosStore: [{
+            año: null,
+            capasStore: [],
+            capaActualStore: 0,
+            aditionalDaysToAdd: [],
+            aditionalDaysToRemove: [],
+            diasActivosStore: [],
+        }],
+        indexAñoStore: 0,
         fechaActualizacion: null,
     },
     reducers: {
         onInitializeCapa: (state, { payload }) => {
-            state.capasStore = [{
-                id: 1,
-                title: 'Capa 1',
-                data: {
-                  initCalendar: new Date(payload, 0, 1),
-                  finishCalendar: new Date(payload, 11, 31),
-                  byWeekday: {},
-                  byMonthday: [],
-                  byMonthdayStr: '',
-                  allDays: false,
-                  agrupar: false,
-                  withHolidays: true,
-                },
-                dependienteDe: null,
-                esPadre: [],
-                dias: [],
-              }];
+            state.añosStore = [...payload.map(año => {
+                return ({
+                    año: año,
+                    capasStore: [{
+                        id: 1,
+                        title: 'Capa 1',
+                        data: {
+                          initCalendar: new Date(año, 0, 1),
+                          finishCalendar: new Date(año, 11, 31),
+                          byWeekday: {},
+                          byMonthday: [],
+                          byMonthdayStr: '',
+                          allDays: false,
+                          agrupar: false,
+                          withHolidays: true,
+                        },
+                        dependienteDe: null,
+                        esPadre: [],
+                        dias: [],
+                      }],
+                    capaActualStore: 0,
+                    aditionalDaysToAdd: [],
+                    aditionalDaysToRemove: [],
+                    diasActivosStore: [],
+                })    
+            })];
         },
         onChangeTitle: (state, { payload }) => {
             state.titleStore = payload;
         },      
         onChangeAditionalDaysToAdd: (state, { payload }) => {
-            // Verifica si el día ya está en la lista
-            const exists = state.aditionalDaysToAdd.some((day) => isSameDay(day, payload));
-            
-            if (exists) {
-                // Si ya está, lo eliminamos
-                state.aditionalDaysToAdd = state.aditionalDaysToAdd.filter(
-                    (day) => !isSameDay(day, payload)
-                );
-            } else {
-                // Si no está, lo añadimos
-                state.aditionalDaysToAdd.push(payload);
-                // También eliminamos el día de la lista de días a excluir
-                state.aditionalDaysToRemove = state.aditionalDaysToRemove.filter(
-                    (day) => !isSameDay(day, payload)
+            const index = state.añosStore.findIndex(config => config.año === payload.año);
+            if (index !== -1) {
+                // Añado el día de la lista de días a añadir
+                state.añosStore[index].aditionalDaysToAdd = [...state.añosStore[index].aditionalDaysToAdd, payload.date];
+                // Elimino el día de la lista de días a excluir
+                state.añosStore[index].aditionalDaysToRemove = state.añosStore[index].aditionalDaysToRemove.filter(
+                    (day) => !isSameDay(day, payload.date)
                 );
             }
         },
         onChangeAditionalDaysToRemove: (state, { payload }) => {
-            // Verifica si el día ya está en la lista
-            const exists = state.aditionalDaysToRemove.some((day) => isSameDay(day, payload));
-            
-            if (exists) {
-                // Si ya está, lo eliminamos
-                state.aditionalDaysToRemove = state.aditionalDaysToRemove.filter(
-                    (day) => !isSameDay(day, payload)
-                );
-            } else {
-                // Si no está, lo añadimos
-                state.aditionalDaysToRemove.push(payload);
-                // También eliminamos el día de la lista de días a añadir
-                state.aditionalDaysToAdd = state.aditionalDaysToAdd.filter(
-                    (day) => !isSameDay(day, payload)
+            const index = state.añosStore.findIndex(config => config.año === payload.año);
+            if (index !== -1) {
+                // Añado el día de la lista de días a excluir
+                state.añosStore[index].aditionalDaysToRemove = [...state.añosStore[index].aditionalDaysToRemove, payload.date];
+                // Elimino el día de la lista de días a añadir
+                state.añosStore[index].aditionalDaysToAdd = state.añosStore[index].aditionalDaysToAdd.filter(
+                    (day) => !isSameDay(day, payload.date)
                 );
             }
         },
         onChangeDiasActivos: (state, { payload }) => {
-            state.diasActivosStore = payload;
+            const index = state.añosStore.findIndex(config => config.año === payload.año);
+            if (index !== -1) {
+                state.añosStore[index].diasActivosStore = payload.data;
+            }
         },
         onChangeCapas: (state, { payload }) => {
-            state.capasStore = payload;
+            console.log("payload capas", payload);  
+            const index = state.añosStore.findIndex(config => config.año === payload.año);
+            console.log("seteando por index", index);
+            if (index !== -1) {
+                state.añosStore[index].capasStore = payload.data;
+            }
         },
         onChangeCapaActual: (state, { payload }) => {
-            state.capaActualStore = payload;
+            const index = state.añosStore.findIndex(config => config.año === payload.año);
+            if (index !== -1) {
+                state.añosStore[index].capaActualStore = payload.data;
+            }
+        },
+        onChangeIndexAño: (state, { payload }) => {
+            state.indexAñoStore = payload;
+        },
+        onChangeAñosStore: (state, { payload }) => {
+            state.añosStore = payload;
         },
     },
 });
@@ -92,4 +108,6 @@ export const {
     onChangeCapas,
     onChangeCapaActual,
     onInitializeCapa,
+    onChangeIndexAño,
+    onChangeAñosStore,
 } = configSlice.actions;

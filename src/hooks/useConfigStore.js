@@ -1,11 +1,10 @@
 import { useDispatch, useSelector } from "react-redux"
-import { onChangeAditionalDaysToAdd, 
-        onChangeAditionalDaysToRemove,
-        onChangeCapaActual,
-        onChangeCapas,
+import { 
+        onChangeAñosStore,
         onChangeDiasActivos, 
-        onChangeTitle 
-} from "../store/config/configSlice";
+        onChangeIndexAño, 
+        onChangeTitle
+    } from "../store/config/configSlice";
 
 export const useConfigStore = ()=> {
 
@@ -13,52 +12,36 @@ export const useConfigStore = ()=> {
 
     const {
         titleStore,
-        capasStore,
-        capaActualStore,
-        diasActivosStore,
-        aditionalDaysToAdd,
-        aditionalDaysToRemove,
+        añosStore,
+        indexAñoStore,
     } = useSelector( state => state.config ); // Accede a configSlice
 
     const changeTitle = (value) => {
         dispatch( onChangeTitle(value) );
     }
 
-    const changeCapas = (capaActualizada) => {
-        dispatch(onChangeCapas(capaActualizada));
-    };       
-
-    const changeAditionalDaysToAdd = (days) => {
-        dispatch( onChangeAditionalDaysToAdd(days) );
+    const changeDiasActivos = (days, año) => {
+        dispatch(onChangeDiasActivos({año, data: days}));
     }
 
-    const changeAditionalDaysToRemove = (days) => {
-        dispatch( onChangeAditionalDaysToRemove(days) );
+    const changeIndexAño = (año) => {
+        dispatch(onChangeIndexAño(año));
     }
 
-    const changeDiasActivos = (days) => {
-        dispatch(onChangeDiasActivos(days));
-    }
-
-    const changeCapaActual = (capa) => {
-        dispatch(onChangeCapaActual(capa));
+    const changeAñosStore = (años) => {
+        dispatch(onChangeAñosStore(años));
     }
 
     return {
         //* Propiedades
         titleStore,
-        capasStore,
-        capaActualStore,
-        diasActivosStore,
-        aditionalDaysToAdd,
-        aditionalDaysToRemove,
+        añosStore,
+        indexAñoStore,
 
         //* Métodos
         changeTitle,
-        changeCapas,
-        changeAditionalDaysToAdd,
-        changeAditionalDaysToRemove,
         changeDiasActivos,
-        changeCapaActual,
+        changeIndexAño,
+        changeAñosStore,
     }
 }

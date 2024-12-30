@@ -26,6 +26,10 @@ const diasDesdeInicioMes = (actual) => {
 const diasDesdeInicioMesDependence = (actual, dias) => {
   let inicio = 1;
   let fin = actual < 0 ? dias.length+actual : inicio+actual;
+  console.log("dias", dias)
+  console.log("actual", actual)
+  console.log("fin", fin)
+
   let nuevosDias = [];
 
   for(inicio; inicio<=fin; inicio++)
@@ -34,7 +38,6 @@ const diasDesdeInicioMesDependence = (actual, dias) => {
 }
 
 const diasHastaFinMesDependence = (actual, dias) => {
-
   let nuevosDias;
   dias[0] > actual
   ? nuevosDias = dias.map(dia => dia - (dias[0] - actual))
@@ -186,13 +189,13 @@ const normalizarFecha = (fecha = new Date()) => {
 export const Rules = (initCalendar, finishCalendar, bymonthday = [], byweekday = {}) => {
   if (Object.keys(byweekday).length === 0) return [];
 
-    const rule = new RRule({
-      freq: RRule.WEEKLY,
-      byweekday: Object.values(byweekday),
-      bymonthday: bymonthday,
-      dtstart: normalizarFecha(initCalendar),
-      until: normalizarFecha(finishCalendar),
-    });
+  const rule = new RRule({
+    freq: RRule.WEEKLY,
+    byweekday: Object.values(byweekday),
+    bymonthday: bymonthday,
+    dtstart: normalizarFecha(initCalendar),
+    until: normalizarFecha(finishCalendar),
+  });
 
   // Lo que voy a retornar
   return rule.all();

@@ -3,8 +3,6 @@ import { useState } from 'react';
 import { SimplePaper } from '../../components';
 import { useAuthStore, useBD, useCalendarStore, useConfigEditStore } from '../../hooks';
 import { useNavigate } from 'react-router-dom';
-import { ExportBprelease, ExportCsv } from '../functions/documentCreator';
-import { createCalendarAutomation, createCalendarbp } from '../functions/calendarCreator';
 import Swal from 'sweetalert2/dist/sweetalert2.js';
 import 'sweetalert2/dist/sweetalert2.min.css';
 
@@ -21,19 +19,7 @@ const CalendariosMonitor = () => {
     const navigate = useNavigate();
 
     const verCalendar = (calendar) => {
-      const capa = {
-          titleStore: calendar.titleStore,
-          capasStore: calendar.capasStore,
-          capaActualStore: calendar.capaActualStore,
-          aditionalDaysToAdd: calendar.aditionalDaysToAdd,
-          aditionalDaysToRemove: calendar.aditionalDaysToRemove,
-          diasActivosStore: calendar.diasActivosStore,
-          _id: calendar._id,
-          isDisabled: false,
-          fechaActualizacion: calendar.fechaActualizacion,
-      };
-
-      changeOnInitializeCapaEdit(capa);
+      changeOnInitializeCapaEdit(calendar);
       navigate('/editar');
   }
 

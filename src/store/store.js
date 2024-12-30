@@ -10,11 +10,11 @@ import { startDataSlice } from "./config/startDataSlice";
 export const store = configureStore({
     reducer: {
         auth: authSlice.reducer,
+        start: startDataSlice.reducer,
         calendar: calendarSlice.reducer,
-        ui: uiSlice.reducer,
         config: configSlice.reducer,
         configEdit: configEditSlice.reducer,
-        start: startDataSlice.reducer,
+        ui: uiSlice.reducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

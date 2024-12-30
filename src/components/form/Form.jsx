@@ -5,7 +5,7 @@ import { SwitchCustom } from "./components/SwitchCustom";
 import { SelectDays } from "./components/SelectDays";
 import { TextFieldCustom } from "./components/TextFieldCustom";
 
-export const CalendarForm = ({ data, actualizarDatosCapa, isDisabled }) => {
+export const Form = ({ data, actualizarDatosCapa, isDisabled }) => {
   const { initCalendar, finishCalendar, byWeekday = {}, byMonthdayStr, allDays, agrupar, withHolidays } = data;
 
   // Memorizar configuraciones específicas para cada componente

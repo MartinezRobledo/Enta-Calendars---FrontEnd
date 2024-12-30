@@ -1,12 +1,12 @@
 import { useDispatch, useSelector } from "react-redux"
-import { onChange_id, onChangeAditionalDaysToAdd, 
-        onChangeAditionalDaysToRemove,
-        onChangeCapaActual,
-        onChangeCapas,
+import { 
+        onChange_id, 
+        onChangeAñosStoreEdit, 
         onChangeDiasActivos, 
+        onChangeIndexAñoEdit, 
         onChangeTitle,
-        onInitializeCapaEdit } from "../store/config/configEditSlice";
-
+        onInitializeCapaEdit 
+} from "../store/config/configEditSlice";
 
 export const useConfigEditStore = ()=> {
 
@@ -14,37 +14,18 @@ export const useConfigEditStore = ()=> {
 
     const {
         titleStore,
-        capasStore,
-        capaActualStore,
-        diasActivosStore,
-        aditionalDaysToAdd,
-        aditionalDaysToRemove,
+        añosStore,
+        indexAñoStore,
         _id,
         isDisabled,
-    } = useSelector( state => state.configEdit ); // Accede a configSlice
+    } = useSelector( state => state.configEdit ); // Accede a configSlice de edicion
 
     const changeTitle = (value) => {
         dispatch( onChangeTitle(value) );
     }
 
-    const changeCapas = (capaActualizada) => {
-        dispatch(onChangeCapas(capaActualizada));
-    };       
-
-    const changeAditionalDaysToAdd = (days) => {
-        dispatch( onChangeAditionalDaysToAdd(days) );
-    }
-
-    const changeAditionalDaysToRemove = (days) => {
-        dispatch( onChangeAditionalDaysToRemove(days) );
-    }
-
     const changeDiasActivos = (days) => {
         dispatch(onChangeDiasActivos(days));
-    }
-
-    const changeCapaActual = (capa) => {
-        dispatch(onChangeCapaActual(capa));
     }
 
     const changeOnInitializeCapaEdit = (capa) => {
@@ -55,25 +36,28 @@ export const useConfigEditStore = ()=> {
         dispatch(onChange_id(id));
     }
 
+    const changeIndexAño = (año) => {
+        dispatch(onChangeIndexAñoEdit(año));
+    }
+
+    const changeAñosStore = (años) => {
+        dispatch(onChangeAñosStoreEdit(años));
+    }
+
     return {
         //* Propiedades
         titleStore,
-        capasStore,
-        capaActualStore,
-        diasActivosStore,
-        aditionalDaysToAdd,
-        aditionalDaysToRemove,
+        añosStore,
+        indexAñoStore,
         _id,
         isDisabled,
 
         //* Métodos
         changeTitle,
-        changeCapas,
-        changeAditionalDaysToAdd,
-        changeAditionalDaysToRemove,
         changeDiasActivos,
-        changeCapaActual,
         changeOnInitializeCapaEdit,
         change_id,
+        changeAñosStore,
+        changeIndexAño,
     }
 }

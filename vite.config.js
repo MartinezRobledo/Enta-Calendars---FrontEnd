@@ -15,4 +15,7 @@ export default defineConfig({
       filename: "stats.html",
     }),
   ],
+  optimizeDeps: {
+    include: ['@mui/material', '@emotion/styled'],
+  },
 })

@@ -3,8 +3,7 @@ import { createSlice } from '@reduxjs/toolkit';
 export const startDataSlice = createSlice({
     name: 'start',
     initialState: {
-        holidays: null,
-        añoFiscal: null,
+        holidays: [],
         templates: null
     },
     reducers: {
@@ -13,8 +12,7 @@ export const startDataSlice = createSlice({
         },
 
         onStartLoadingHolidays: ( state, { payload } ) => {
-            state.holidays = payload.holidays;
-            state.añoFiscal = payload.año;
+            state.holidays = payload;
         },
     }
 });

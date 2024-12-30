@@ -1,14 +1,14 @@
 import { Button } from '@mui/material'
 
-export const SubmitCustom = ({Buttons = [], onClick, isDisabled, bgColor = 'primary.main', hoverBgColor = 'primary.extra', icon = null}) => {
-  return Buttons.map(btn => 
+
+export const ActionButtons = ({Buttons = [], isDisabled, bgColor = 'primary.main', hoverBgColor = 'primary.extra'}) => {
+  return Buttons.map( action => 
       (
         <Button
           disabled={isDisabled}
-          key={btn}
-          id={btn}
+          key={action.key}
           variant="contained"
-          startIcon={icon}
+          startIcon={action.icon}
           sx={{ 
           color: 'default.main', // Texto e ícono toman el color del tema
           margin: 1,
@@ -19,9 +19,9 @@ export const SubmitCustom = ({Buttons = [], onClick, isDisabled, bgColor = 'prim
               backgroundColor: hoverBgColor, // Fondo al hacer hover
               }
           }}
-          onClick={e => onClick(e)}
+          onClick={e => action.handler(e)}
         >
-          {btn}
+          {action.key}
         </Button>
       )
     )
